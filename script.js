@@ -3,7 +3,7 @@ const campaignsData = [
     {
         id: 1,
         title: "Jadilah pendukung pendidikan iklim untuk generasi masa depan",
-        image: "https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&q=80&w=500",
+        image: "assets/CardPict/Lingkungan.png",
         category: "Lingkungan",
         collected: 160000,
         target: 20000000,
@@ -13,7 +13,7 @@ const campaignsData = [
     {
         id: 2,
         title: "Gerakan Makan Gratis di Masjid Jumat Berkah",
-        image: "https://images.unsplash.com/photo-1594708767771-a7502209ff51?auto=format&fit=crop&q=80&w=500",
+        image: "assets/CardPict/Sosial.png",
         category: "Sosial",
         collected: 9800000,
         target: 108000000,
@@ -23,7 +23,7 @@ const campaignsData = [
     {
         id: 3,
         title: "Bantu Abah Hendra Sembuh dari Stroke Berkepanjangan",
-        image: "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&q=80&w=500",
+        image: "assets/CardPict/Kesehatan.png",
         category: "Kesehatan",
         collected: 11825000,
         target: 30000000,
@@ -33,7 +33,7 @@ const campaignsData = [
     {
         id: 4,
         title: "Vege & Feli Bergerak Untuk Pendidikan Sumatra",
-        image: "https://images.unsplash.com/photo-1518458028785-8fbcd101ebb9?auto=format&fit=crop&q=80&w=500",
+        image: "assets/CardPict/Pendidikan.png",
         category: "Pendidikan",
         collected: 6220019,
         target: 8000000,
@@ -43,7 +43,7 @@ const campaignsData = [
     {
         id: 5,
         title: "Bangun Jembatan Desa Pelosok yang Putus",
-        image: "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&q=80&w=500",
+        image: "assets/CardPict/Sosial2.png",
         category: "Sosial",
         collected: 45000000,
         target: 50000000,
@@ -53,7 +53,7 @@ const campaignsData = [
     {
         id: 6,
         title: "Beasiswa Anak Yatim Berprestasi",
-        image: "https://images.unsplash.com/photo-1427504743055-e99aa31546d5?auto=format&fit=crop&q=80&w=500",
+        image: "assets/CardPict/Pendidikan2.jpg",
         category: "Pendidikan",
         collected: 2500000,
         target: 15000000,
