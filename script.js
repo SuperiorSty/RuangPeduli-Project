@@ -1,9 +1,10 @@
 // --- 1. DATA DUMMY (Database Sementara) ---
+// Sama seperti sebelumnya, hanya dipindah ke file terpisah
 const campaignsData = [
     {
         id: 1,
         title: "Jadilah pendukung pendidikan iklim untuk generasi masa depan",
-        image: "https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&q=80&w=500",
+        image: "assets/CardPict/Lingkungan.png",
         category: "Lingkungan",
         collected: 160000,
         target: 20000000,
@@ -13,9 +14,9 @@ const campaignsData = [
     {
         id: 2,
         title: "Gerakan Makan Gratis di Masjid Jumat Berkah",
-        image: "https://images.unsplash.com/photo-1594708767771-a7502209ff51?auto=format&fit=crop&q=80&w=500",
+        image: "assets/CardPict/Sosial.png",
         category: "Sosial",
-        collected: 0,
+        collected: 9800000,
         target: 108000000,
         organizer: "Sedekah Global",
         verified: true
@@ -23,7 +24,7 @@ const campaignsData = [
     {
         id: 3,
         title: "Bantu Abah Hendra Sembuh dari Stroke Berkepanjangan",
-        image: "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&q=80&w=500",
+        image: "assets/CardPict/Kesehatan.png",
         category: "Kesehatan",
         collected: 11825000,
         target: 30000000,
@@ -33,11 +34,31 @@ const campaignsData = [
     {
         id: 4,
         title: "Vege & Feli Bergerak Untuk Pendidikan Sumatra",
-        image: "https://images.unsplash.com/photo-1518458028785-8fbcd101ebb9?auto=format&fit=crop&q=80&w=500",
+        image: "assets/CardPict/Pendidikan.png",
         category: "Pendidikan",
         collected: 6220019,
         target: 8000000,
         organizer: "Vege Team",
+        verified: true
+    },
+    {
+        id: 5,
+        title: "Bangun Jembatan Desa Pelosok yang Putus",
+        image: "assets/CardPict/Sosial2.png",
+        category: "Sosial",
+        collected: 45000000,
+        target: 50000000,
+        organizer: "Kawan Desa",
+        verified: true
+    },
+    {
+        id: 6,
+        title: "Beasiswa Anak Yatim Berprestasi",
+        image: "assets/CardPict/Pendidikan2.jpg",
+        category: "Pendidikan",
+        collected: 2500000,
+        target: 15000000,
+        organizer: "Yayasan Harapan",
         verified: true
     }
 ];
@@ -51,155 +72,192 @@ const formatRupiah = (number) => {
     }).format(number).replace('IDR', 'Rp');
 };
 
-// --- 3. FUNGSI RENDER KARTU (Dengan Styling Brand & Fitur Search) ---
-// Menerima parameter 'keyword' agar search bar tetap berfungsi
-function renderCampaigns(keyword = '') {
-    const container = document.getElementById('campaign-list');
+// --- 3. FUNGSI RENDER GENERIC (Pembuat Kartu HTML) ---
+function createCardHTML(item) {
+    let percentage = (item.collected / item.target) * 100;
+    if (percentage > 100) percentage = 100;
+
+    return `
+        <div onclick="window.location.href='#detail/${item.id}'" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full group cursor-pointer transform hover:-translate-y-1">
+            
+            <!-- Gambar Card -->
+            <div class="relative h-48 w-full overflow-hidden">
+                <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
+                <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-brand-700 shadow-sm border border-gray-100">
+                    ${item.category}
+                </div>
+            </div>
+
+            <!-- Konten Card -->
+            <div class="p-5 flex flex-col flex-grow">
+                <h3 class="font-bold text-lg text-gray-900 leading-snug mb-3 line-clamp-2 min-h-[3.5rem] group-hover:text-brand-600 transition">
+                    ${item.title}
+                </h3>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-gray-100 rounded-full h-2.5 mb-2 overflow-hidden">
+                    <div class="bg-brand-500 h-2.5 rounded-full transition-all duration-1000" style="width: ${percentage}%"></div>
+                </div>
+
+                <!-- Info Donasi -->
+                <div class="flex justify-between items-center text-xs text-gray-500 mb-4">
+                    <div>
+                        <span class="text-brand-600 font-bold text-sm block">${formatRupiah(item.collected)}</span>
+                        <span>terkumpul</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-bold text-gray-700 block">${Math.round(percentage)}%</span>
+                        <span class="text-gray-400">tercapai</span>
+                    </div>
+                </div>
+
+                <!-- Organizer Info -->
+                <div class="mt-auto flex items-center pt-4 border-t border-gray-50">
+                    <div class="w-8 h-8 rounded-full bg-brand-50 border border-brand-100 mr-3 flex items-center justify-center text-brand-500">
+                        <i class="fas fa-user text-xs"></i>
+                    </div>
+                    <div class="flex items-center text-sm font-medium text-gray-600 truncate">
+                        <span class="truncate mr-1 max-w-[120px]">${item.organizer}</span>
+                        ${item.verified ? '<i class="fas fa-check-circle text-blue-500 text-xs" title="Terverifikasi"></i>' : ''}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tombol Donasi -->
+            <div class="p-4 pt-0">
+                <button class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-lg transition duration-200 shadow-sm shadow-brand-200">
+                    Donasi
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// --- 4. RENDER BERANDA (HOME) ---
+function renderHomeCampaigns() {
+    const container = document.getElementById('home-campaign-list');
+    if(!container) return;
+
+    const trendingData = campaignsData.slice(0, 3); // Ambil 3 data pertama
     
-    // Safety check: kalau elemen tidak ada, stop
-    if (!container) return;
+    let html = '';
+    trendingData.forEach(item => {
+        html += createCardHTML(item);
+    });
+    container.innerHTML = html;
+}
 
-    // Filter data berdasarkan keyword pencarian
-    const filteredData = campaignsData.filter(item => 
-        item.title.toLowerCase().includes(keyword.toLowerCase())
-    );
+// --- 5. RENDER HALAMAN GALANG DANA (EXPLORE) ---
+let currentCategory = 'Semua';
+let currentSearch = '';
 
-    // Reset isi container
-    container.innerHTML = '';
+function renderExploreCampaigns() {
+    const container = document.getElementById('all-campaign-list');
+    if(!container) return;
 
-    // Cek jika hasil pencarian kosong
-    if (filteredData.length === 0) {
+    // Filter Logic
+    const filtered = campaignsData.filter(item => {
+        const matchCategory = currentCategory === 'Semua' || item.category === currentCategory;
+        const matchSearch = item.title.toLowerCase().includes(currentSearch.toLowerCase());
+        return matchCategory && matchSearch;
+    });
+
+    // Empty State
+    if (filtered.length === 0) {
         container.innerHTML = `
-            <div class="col-span-full text-center py-10 text-gray-400">
-                <i class="fas fa-search text-3xl mb-2"></i>
-                <p>Tidak ada kampanye yang cocok.</p>
+            <div class="col-span-full text-center py-16 bg-white rounded-xl border border-dashed border-gray-300">
+                <i class="fas fa-search text-4xl text-gray-300 mb-4"></i>
+                <h3 class="text-lg font-bold text-gray-600">Yah, tidak ada hasil.</h3>
+                <p class="text-gray-400">Coba ganti kata kunci atau kategori lain.</p>
+                <button onclick="resetFilter()" class="mt-4 text-brand-600 font-bold hover:underline">Reset Filter</button>
             </div>
         `;
         return;
     }
 
-    // Loop data dan buat HTML Card
-    filteredData.forEach(item => {
-        // Hitung persentase
-        let percentage = (item.collected / item.target) * 100;
-        if (percentage > 100) percentage = 100; 
+    // Generate HTML
+    let html = '';
+    filtered.forEach(item => {
+        html += createCardHTML(item);
+    });
+    container.innerHTML = html;
+}
 
-        // Tentukan template Card
-        const cardHTML = `
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full group cursor-pointer">
-                
-                <!-- Gambar Card -->
-                <div class="relative h-48 w-full overflow-hidden">
-                    <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
-                    <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-brand-700 shadow-sm">
-                        ${item.category}
-                    </div>
-                </div>
+// --- 6. HANDLE FILTER & BUTTONS ---
+function filterCampaigns(category) {
+    currentCategory = category;
+    
+    // Update Tampilan Tombol
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        if(btn.dataset.category === category) {
+            btn.className = "filter-btn active px-5 py-2 rounded-full text-sm font-bold border transition whitespace-nowrap bg-brand-600 text-white border-brand-600 shadow-md";
+        } else {
+            btn.className = "filter-btn px-5 py-2 rounded-full text-sm font-bold border border-gray-300 text-gray-600 bg-white hover:border-brand-500 hover:text-brand-600 transition whitespace-nowrap";
+        }
+    });
 
-                <!-- Konten Card -->
-                <div class="p-5 flex flex-col flex-grow">
-                    <h3 class="font-bold text-lg text-gray-900 leading-snug mb-3 line-clamp-2 min-h-[3.5rem] group-hover:text-brand-600 transition">
-                        ${item.title}
-                    </h3>
+    renderExploreCampaigns();
+}
 
-                    <!-- Progress Bar (Warna Brand) -->
-                    <div class="w-full bg-gray-100 rounded-full h-2.5 mb-2">
-                        <div class="bg-brand-500 h-2.5 rounded-full" style="width: ${percentage}%"></div>
-                    </div>
+function resetFilter() {
+    const searchInput = document.getElementById('explore-search');
+    if(searchInput) searchInput.value = '';
+    currentSearch = '';
+    filterCampaigns('Semua');
+}
 
-                    <!-- Info Donasi -->
-                    <div class="flex justify-between items-center text-xs text-gray-500 mb-4">
-                        <div>
-                            <span class="text-brand-600 font-bold text-sm">${formatRupiah(item.collected)}</span>
-                            <span> terkumpul</span>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-gray-400">dari ${formatRupiah(item.target)}</span>
-                        </div>
-                    </div>
-
-                    <!-- Organizer Info -->
-                    <div class="mt-auto flex items-center pt-4 border-t border-gray-50">
-                        <div class="w-8 h-8 rounded-full bg-brand-50 overflow-hidden mr-3 flex items-center justify-center text-brand-500">
-                            <!-- Pakai inisial kalau avatar error, atau pakai dicebear -->
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="flex items-center text-sm font-medium text-gray-700">
-                            ${item.organizer}
-                            ${item.verified ? '<i class="fas fa-check-circle text-blue-500 ml-1 text-xs" title="Terverifikasi"></i>' : ''}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tombol Donasi (Warna Brand) -->
-                <div class="p-4 pt-0">
-                    <button class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-lg transition duration-200 shadow-sm shadow-brand-200">
-                        Donasi Sekarang
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        container.innerHTML += cardHTML;
+// Listener Search di halaman Explore
+const exploreSearchInput = document.getElementById('explore-search');
+if(exploreSearchInput) {
+    exploreSearchInput.addEventListener('input', (e) => {
+        currentSearch = e.target.value;
+        renderExploreCampaigns();
     });
 }
 
-// --- 4. SISTEM ROUTING SPA (Updated & Fix Conflict) ---
-// Kita pakai logic baru ini karena mendukung 'hidden-section' (untuk fix login page)
+// --- 7. SPA ROUTING (Standard) ---
 function handleRouting() {
     const hash = window.location.hash || '#home';
     
-    // 1. Sembunyikan SEMUA section terlebih dahulu
+    // Bersihkan tampilan section
     document.querySelectorAll('section').forEach(section => {
         section.classList.remove('active-section');
-        section.classList.add('hidden-section'); // PENTING: Paksa sembunyi
+        section.classList.add('hidden-section');
     });
     
-    // 2. Tentukan target
-    const targetId = hash.replace('#', '');
+    // Tentukan target
+    let targetId = hash.replace('#', '');
+    if(targetId.includes('/')) targetId = targetId.split('/')[0];
+    
     const targetSection = document.getElementById(targetId);
 
-    // 3. Tampilkan target jika ada
     if (targetSection) {
-        targetSection.classList.remove('hidden-section'); // Hapus paksa sembunyi
-        // Timeout kecil biar animasi CSS transisi jalan halus
-        setTimeout(() => {
-            targetSection.classList.add('active-section');
-        }, 10);
+        targetSection.classList.remove('hidden-section');
+        setTimeout(() => targetSection.classList.add('active-section'), 10);
     } else {
-        // Fallback ke Home
-        const home = document.getElementById('home');
-        if(home) {
-            home.classList.remove('hidden-section');
-            home.classList.add('active-section');
-        }
+        // Default ke Home jika hash tidak dikenali
+        document.getElementById('home').classList.remove('hidden-section');
+        document.getElementById('home').classList.add('active-section');
     }
 
-    // 4. Update Navbar Active State (Opsional biar rapi)
+    // Update Navbar Active State
     document.querySelectorAll('nav a').forEach(link => {
-        if(link.getAttribute('href') === hash) {
+        const href = link.getAttribute('href');
+        if(href === hash) {
             link.classList.add('text-brand-600');
         } else {
             link.classList.remove('text-brand-600');
         }
     });
 
-    // 5. Scroll ke atas
     window.scrollTo(0, 0);
 }
 
-// --- 5. INISIALISASI ---
+// --- 8. INITIALIZATION ---
 window.addEventListener('load', () => {
     handleRouting();
-    renderCampaigns(); // Render data awal
-    
-    // Listener Search Input (Agar search bar jalan)
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            renderCampaigns(e.target.value);
-        });
-    }
+    renderHomeCampaigns();
+    renderExploreCampaigns();
 });
 
 window.addEventListener('hashchange', handleRouting);
