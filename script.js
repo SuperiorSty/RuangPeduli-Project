@@ -1,4 +1,5 @@
 // --- 1. DATA DUMMY (Database Sementara) ---
+// Kampanye Donasi
 let campaignsData = [
   {
     id: 1,
@@ -74,9 +75,38 @@ let campaignsData = [
   },
 ];
 
+// --- [BARU] DATA DUMMY RELAWAN ---
+let volunteerCampaigns = [
+    {
+        id: 201,
+        title: "Relawan Mengajar di Sumba",
+        location: "Sumba, NTT",
+        date: "2023-12-10",
+        image: "https://placehold.co/400x250?text=Mengajar+Sumba",
+        description: "Mari berbagi ilmu dengan anak-anak di pedalaman Sumba. Dibutuhkan 5 orang relawan pengajar Matematika dasar dan Bahasa Inggris.",
+        isActive: true
+    },
+    {
+        id: 202,
+        title: "Bersih Pantai Kuta Bali",
+        location: "Kuta, Bali",
+        date: "2023-11-20",
+        image: "https://placehold.co/400x250?text=Bersih+Pantai",
+        description: "Aksi nyata membersihkan sampah plastik di sepanjang pantai Kuta. Free snack dan sertifikat.",
+        isActive: true
+    }
+];
+
+// Data Pendaftar Relawan (Applicants)
+let volunteerApplicants = [
+    { id: 1, campaignId: 201, userId: 2, name: "Budi Santoso", contact: "08123456789", status: "Pending" },
+    { id: 2, campaignId: 202, userId: 2, name: "Budi Santoso", contact: "08123456789", status: "Diterima" }
+];
+
+
 // --- [BARU] DUMMY RIWAYAT DONASI & AKTIVITAS ---
 // Ini simulasi data database transaksi
-const donationsHistory = [
+let donationsHistory = [
     { id: 101, userId: 2, campaignId: 1, amount: 50000, date: '2023-10-25', status: 'Berhasil' },
     { id: 102, userId: 2, campaignId: 4, amount: 100000, date: '2023-11-02', status: 'Berhasil' },
     { id: 103, userId: 1, campaignId: 2, amount: 1000000, date: '2023-10-15', status: 'Berhasil' }, // Admin donasi juga
@@ -88,7 +118,7 @@ const donationsHistory = [
 const usersData = [
   {
     id: 1,
-    name: "Admin Super",
+    name: "Admin",
     email: "admin@ruangpeduli.com",
     password: "admin123",
     role: "admin",
@@ -113,7 +143,7 @@ const formatRupiah = (number) => {
     .replace("IDR", "Rp");
 };
 
-// --- FUNGSI RENDER GENERIC (Pembuat Kartu HTML) ---
+// --- FUNGSI RENDER DONATION CARD ---
 function createCardHTML(item) {
   let percentage = (item.collected / item.target) * 100;
   if (percentage > 100) percentage = 100;
@@ -193,6 +223,32 @@ function createCardHTML(item) {
     `;
 }
 
+// --- [BARU] FUNGSI RENDER VOLUNTEER CARD (PUBLIC) ---
+function createVolunteerCardHTML(item) {
+    return `
+        <div class="bg-white rounded-xl shadow-sm border border-blue-100 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full transform hover:-translate-y-1">
+            <div class="relative h-48 w-full overflow-hidden bg-gray-200">
+                <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover">
+                <div class="absolute top-3 left-3 bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold shadow-md">
+                    Relawan
+                </div>
+            </div>
+            <div class="p-5 flex flex-col flex-grow">
+                 <h3 class="font-bold text-lg text-gray-900 leading-snug mb-2 line-clamp-2">${item.title}</h3>
+                 <p class="text-sm text-gray-500 mb-3"><i class="fas fa-map-marker-alt text-red-400 mr-2"></i>${item.location}</p>
+                 <p class="text-sm text-gray-500 mb-4"><i class="far fa-calendar-alt text-blue-400 mr-2"></i>${item.date}</p>
+                 <p class="text-gray-600 text-sm line-clamp-3 mb-4">${item.description}</p>
+                 
+                 <div class="mt-auto">
+                    <button onclick="registerVolunteer(${item.id})" class="w-full bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 font-bold py-2.5 rounded-lg transition">
+                        Daftar Jadi Relawan
+                    </button>
+                 </div>
+            </div>
+        </div>
+    `;
+}
+
 // --- RENDER BERANDA (HOME) ---
 function renderHomeCampaigns() {
   const container = document.getElementById("home-campaign-list");
@@ -244,6 +300,63 @@ function renderExploreCampaigns() {
   container.innerHTML = html;
 }
 
+// --- [BARU] RENDER HALAMAN RELAWAN (PUBLIC) ---
+function renderVolunteerPage() {
+    const container = document.getElementById("volunteer-campaign-list");
+    if (!container) return;
+
+    if (volunteerCampaigns.length === 0) {
+        container.innerHTML = `<p class="col-span-full text-center text-gray-500">Belum ada kegiatan relawan saat ini.</p>`;
+        return;
+    }
+
+    let html = "";
+    volunteerCampaigns.forEach(item => {
+        html += createVolunteerCardHTML(item);
+    });
+    container.innerHTML = html;
+}
+
+// --- [BARU] RENDER HALAMAN ADMIN RELAWAN (MANAGE APPLICANTS) ---
+function renderAdminRelawan() {
+    const tbody = document.getElementById("admin-volunteer-tbody");
+    if(!tbody) return;
+
+    if (volunteerApplicants.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-400">Belum ada pendaftar relawan.</td></tr>`;
+        return;
+    }
+
+    let html = "";
+    volunteerApplicants.forEach(app => {
+        // Cari info campaignnya
+        const campaign = volunteerCampaigns.find(c => c.id === app.campaignId);
+        const title = campaign ? campaign.title : "Kegiatan Dihapus";
+        
+        let statusBadge = "";
+        if(app.status === 'Pending') statusBadge = `<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-bold">Pending</span>`;
+        else if(app.status === 'Diterima') statusBadge = `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold">Diterima</span>`;
+        else statusBadge = `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-bold">Ditolak</span>`;
+
+        html += `
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 font-bold text-gray-700">${app.name}</td>
+                <td class="px-6 py-4 text-gray-600">${title}</td>
+                <td class="px-6 py-4 text-gray-500">${app.contact}</td>
+                <td class="px-6 py-4">${statusBadge}</td>
+                <td class="px-6 py-4 text-center">
+                    ${app.status === 'Pending' ? `
+                    <button onclick="updateVolunteerStatus(${app.id}, 'Diterima')" class="bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600 mr-2">Terima</button>
+                    <button onclick="updateVolunteerStatus(${app.id}, 'Ditolak')" class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600">Tolak</button>
+                    ` : '<span class="text-xs text-gray-400">Selesai</span>'}
+                </td>
+            </tr>
+        `;
+    });
+    tbody.innerHTML = html;
+}
+
+
 // --- [BARU] RENDER DASHBOARD (LOGIC UTAMA) ---
 function renderDashboard() {
     const user = JSON.parse(localStorage.getItem("currentUser"));
@@ -255,23 +368,31 @@ function renderDashboard() {
 
     // 2. Logic Tombol Aksi (Khusus Admin vs User)
     const actionContainer = document.getElementById("dashboard-action-buttons");
+    const adminManageSection = document.getElementById("admin-management-section");
+
     if (user.role === 'admin') {
+        // ADMIN DASHBOARD
         actionContainer.innerHTML = `
-            <div class="flex gap-3">
-                <button onclick="alert('Fitur Kelola Relawan (Segera Hadir)')" class="bg-white border border-gray-300 text-gray-700 font-bold py-2.5 px-4 rounded-lg hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
-                    <i class="fas fa-users"></i> Relawan
+            <div class="flex flex-wrap gap-3 justify-end">
+                <button onclick="window.location.hash='#admin-relawan'" class="bg-white border border-blue-200 text-blue-600 font-bold py-2.5 px-4 rounded-lg hover:bg-blue-50 transition shadow-sm flex items-center gap-2">
+                    <i class="fas fa-users-cog"></i> Kelola Relawan
+                </button>
+                <button onclick="window.location.hash='#buat-relawan'" class="bg-blue-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-blue-700 transition shadow-sm flex items-center gap-2">
+                    Buat Kegiatan
                 </button>
                 <button onclick="window.location.hash='#create-form'" class="bg-brand-600 text-white font-bold py-2.5 px-5 rounded-lg hover:bg-brand-700 transition shadow-lg flex items-center gap-2">
-                    <i class="fas fa-plus"></i> Buat Kampanye
+                    Buat Donasi
                 </button>
             </div>
         `;
         
+        // Tampilkan Tabel Manajemen Kampanye (Untuk Hapus)
+        adminManageSection.classList.remove('hidden');
+        renderAdminCampaignManagement();
+
         // ADMIN STATS (Global)
-        // Hitung total semua donasi di platform (mockup logic)
-        // Disini kita hitung dari campaignsData saja untuk simpelnya
         const totalPlatformDonations = campaignsData.reduce((acc, curr) => acc + curr.collected, 0);
-        const totalCampaigns = campaignsData.length;
+        const totalCampaigns = campaignsData.length + volunteerCampaigns.length;
 
         document.getElementById("stat-label-1").innerText = "Total Donasi Masuk";
         document.getElementById("stat-value-1").innerText = formatRupiah(totalPlatformDonations);
@@ -280,11 +401,18 @@ function renderDashboard() {
         document.getElementById("stat-value-2").innerText = totalCampaigns;
 
     } else {
-        // USER STATS (Pribadi)
+        // USER DASHBOARD
+        adminManageSection.classList.add('hidden'); // Sembunyikan tabel admin
+        
         actionContainer.innerHTML = `
-            <button onclick="window.location.href='#create'" class="bg-brand-600 text-white font-bold py-2.5 px-5 rounded-lg hover:bg-brand-700 transition shadow-lg flex items-center gap-2">
-                <i class="fas fa-heart"></i> Mulai Donasi
-            </button>
+            <div class="flex gap-3">
+                 <button onclick="window.location.href='#relawan'" class="bg-white border border-brand-200 text-brand-600 font-bold py-2.5 px-5 rounded-lg hover:bg-brand-50 transition shadow-sm flex items-center gap-2">
+                    <i class="fas fa-hands-helping"></i> Jadi Relawan
+                </button>
+                <button onclick="window.location.href='#create'" class="bg-brand-600 text-white font-bold py-2.5 px-5 rounded-lg hover:bg-brand-700 transition shadow-lg flex items-center gap-2">
+                    <i class="fas fa-heart"></i> Mulai Donasi
+                </button>
+            </div>
         `;
 
         // Filter donasi milik user ini
@@ -304,14 +432,11 @@ function renderDashboard() {
     let historyData = [];
 
     if (user.role === 'admin') {
-        // Admin lihat semua transaksi (mockup: ambil 5 terakhir dari dummy)
         historyData = donationsHistory; 
     } else {
-        // User lihat punya sendiri
         historyData = donationsHistory.filter(d => d.userId === user.id);
     }
 
-    // Sort by Date Descending
     historyData.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     if (historyData.length === 0) {
@@ -319,11 +444,9 @@ function renderDashboard() {
     } else {
         let html = "";
         historyData.forEach(trx => {
-            // Cari nama campaign
             const campaign = campaignsData.find(c => c.id === trx.campaignId);
             const campaignTitle = campaign ? campaign.title : "Kampanye Tidak Dikenal";
             
-            // Status Color
             let statusColor = "text-green-600 bg-green-50";
             if (trx.status === 'Pending') statusColor = "text-yellow-600 bg-yellow-50";
 
@@ -332,7 +455,7 @@ function renderDashboard() {
                     <td class="px-6 py-4 whitespace-nowrap text-gray-500">${trx.date}</td>
                     <td class="px-6 py-4">
                         <div class="text-sm font-bold text-gray-900 line-clamp-1">${campaignTitle}</div>
-                        <div class="text-xs text-gray-400">ID: #${trx.id}</div>
+                        <div class="text-xs text-gray-400">ID Donasi: #${trx.id}</div>
                     </td>
                     <td class="px-6 py-4">
                         <span class="px-3 py-1 rounded-full text-xs font-bold ${statusColor}">${trx.status}</span>
@@ -345,6 +468,72 @@ function renderDashboard() {
         });
         historyBody.innerHTML = html;
     }
+}
+
+// --- [BARU] RENDER TABEL MANAGEMEN KAMPANYE (ADMIN HAPUS) ---
+function renderAdminCampaignManagement() {
+    const tbody = document.getElementById("admin-campaign-list-body");
+    if (!tbody) return;
+
+    let html = "";
+
+    // 1. List Donasi
+    campaignsData.forEach(c => {
+        html += `
+             <tr class="hover:bg-red-50 transition group">
+                <td class="px-6 py-3 text-xs text-gray-500">#${c.id}</td>
+                <td class="px-6 py-3 font-semibold text-gray-800 line-clamp-1">${c.title}</td>
+                <td class="px-6 py-3 text-xs"><span class="bg-gray-100 text-gray-600 px-2 py-1 rounded">Donasi</span></td>
+                <td class="px-6 py-3 text-xs text-green-600 font-bold">Aktif</td>
+                <td class="px-6 py-3 text-center">
+                    <button onclick="handleDeleteCampaign(${c.id}, 'donation')" class="text-red-400 hover:text-red-600 transition">
+                        <i class="fas fa-trash"></i> Hapus
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    // 2. List Relawan
+    volunteerCampaigns.forEach(v => {
+        html += `
+             <tr class="hover:bg-red-50 transition group">
+                <td class="px-6 py-3 text-xs text-gray-500">#${v.id}</td>
+                <td class="px-6 py-3 font-semibold text-gray-800 line-clamp-1">${v.title}</td>
+                <td class="px-6 py-3 text-xs"><span class="bg-blue-100 text-blue-600 px-2 py-1 rounded">Relawan</span></td>
+                <td class="px-6 py-3 text-xs text-green-600 font-bold">Aktif</td>
+                <td class="px-6 py-3 text-center">
+                    <button onclick="handleDeleteCampaign(${v.id}, 'volunteer')" class="text-red-400 hover:text-red-600 transition">
+                        <i class="fas fa-trash"></i> Hapus
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    if (html === "") {
+        html = `<tr><td colspan="5" class="text-center py-4 text-gray-400">Tidak ada kampanye aktif.</td></tr>`;
+    }
+
+    tbody.innerHTML = html;
+}
+
+// --- [BARU] FUNGSI HAPUS KAMPANYE ---
+function handleDeleteCampaign(id, type) {
+    if(!confirm("Apakah Anda yakin ingin menghapus kampanye ini? Data yang dihapus tidak bisa dikembalikan.")) return;
+
+    if (type === 'donation') {
+        campaignsData = campaignsData.filter(c => c.id !== id);
+    } else {
+        volunteerCampaigns = volunteerCampaigns.filter(v => v.id !== id);
+    }
+
+    // Re-render
+    renderDashboard();
+    renderHomeCampaigns();
+    renderExploreCampaigns();
+    renderVolunteerPage(); // Kalau ada yg dihapus
+    alert("Kampanye berhasil dihapus!");
 }
 
 
@@ -472,25 +661,7 @@ if (exploreSearchInput) {
   });
 }
 
-// --- FUNGSI PREVIEW GAMBAR ---
-function updateImagePreview() {
-  const url = document.getElementById("new-image").value.trim();
-  const preview = document.getElementById("image-preview");
-
-  if (!preview) return; 
-
-  preview.referrerPolicy = "no-referrer";
-
-  if (url && url.length > 0) {
-    preview.src = url;
-    preview.classList.remove("opacity-50");
-  } else {
-    preview.src = "https://placehold.co/600x400?text=Pratinjau+Gambar";
-    preview.classList.add("opacity-50");
-  }
-}
-
-// --- LOGIKA FORM GALANG DANA ---
+// --- LOGIKA FORM DONASI ---
 function handleCreateCampaign(event) {
   event.preventDefault();
 
@@ -520,21 +691,94 @@ function handleCreateCampaign(event) {
     target: target,
     organizer: organizer,
     verified: true,
-    isActive: true, // Default Aktif
+    isActive: true,
     description: description,
   };
 
   campaignsData.push(newCampaign);
   event.target.reset();
   
-  // Setelah create, kembali ke dashboard
   window.location.hash = "#dashboard";
   renderExploreCampaigns();
   renderHomeCampaigns();
-  alert("Kampanye berhasil dibuat! Silakan cek di Explore.");
+  alert("Kampanye Donasi berhasil dibuat!");
 }
 
-// --- SPA ROUTING (Diperbarui untuk Dashboard) ---
+// --- [BARU] LOGIKA FORM RELAWAN ---
+function handleCreateVolunteerCampaign(event) {
+    event.preventDefault();
+
+    const title = document.getElementById("vol-title").value.trim();
+    const location = document.getElementById("vol-location").value.trim();
+    const date = document.getElementById("vol-date").value;
+    const imageInput = document.getElementById("vol-image").value.trim();
+    const description = document.getElementById("vol-description").value.trim();
+
+    const image = imageInput && imageInput.length > 0
+      ? imageInput
+      : "https://placehold.co/400x250?text=Kegiatan+Relawan";
+
+    const newId = volunteerCampaigns.length > 0 ? Math.max(...volunteerCampaigns.map(v => v.id)) + 1 : 201;
+
+    const newVol = {
+        id: newId,
+        title: title,
+        location: location,
+        date: date,
+        image: image,
+        description: description,
+        isActive: true
+    };
+
+    volunteerCampaigns.push(newVol);
+    event.target.reset();
+
+    window.location.hash = "#dashboard";
+    renderVolunteerPage();
+    alert("Kegiatan Relawan berhasil dibuat!");
+}
+
+// --- [BARU] LOGIKA DAFTAR RELAWAN (USER) ---
+function registerVolunteer(campaignId) {
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+    if (!user) {
+        alert("Silakan login terlebih dahulu untuk mendaftar jadi relawan!");
+        window.location.hash = "#login";
+        return;
+    }
+
+    // Cek apakah sudah mendaftar
+    const alreadyRegistered = volunteerApplicants.find(a => a.campaignId === campaignId && a.userId === user.id);
+    if(alreadyRegistered) {
+        alert("Anda sudah mendaftar di kegiatan ini. Silakan tunggu konfirmasi.");
+        return;
+    }
+
+    const newApp = {
+        id: Date.now(),
+        campaignId: campaignId,
+        userId: user.id,
+        name: user.name,
+        contact: "081xxxxxxx", // Default kontak
+        status: "Pending"
+    };
+
+    volunteerApplicants.push(newApp);
+    alert("Berhasil mendaftar! Admin akan meninjau pendaftaran Anda.");
+}
+
+// --- [BARU] LOGIKA TERIMA/TOLAK RELAWAN (ADMIN) ---
+function updateVolunteerStatus(appId, newStatus) {
+    const appIndex = volunteerApplicants.findIndex(a => a.id === appId);
+    if(appIndex !== -1) {
+        volunteerApplicants[appIndex].status = newStatus;
+        renderAdminRelawan(); // Re-render table
+        alert(`Status relawan berhasil diubah menjadi: ${newStatus}`);
+    }
+}
+
+
+// --- SPA ROUTING ---
 function handleRouting() {
   const hash = window.location.hash || "#home";
 
@@ -554,40 +798,41 @@ function handleRouting() {
 
   const targetSection = document.getElementById(targetSectionId);
 
+  // --- ACCESS GUARD (PROTEKSI HALAMAN) ---
   if (targetSection) {
-    // GUARD: Cek Akses Dashboard / Create Form
-    if (targetSectionId === "dashboard" || targetSectionId === "create-form") {
-        const user = JSON.parse(localStorage.getItem("currentUser"));
-        
-        // 1. Harus Login
-        if (!user) {
-            alert("Silakan masuk terlebih dahulu untuk mengakses Dashboard.");
-            window.location.hash = "#login";
-            return;
-        }
+      const user = JSON.parse(localStorage.getItem("currentUser"));
 
-        // 2. Khusus Create Form: Harus Admin
-        if (targetSectionId === "create-form" && user.role !== "admin") {
-             alert("Akses ditolak! Hanya admin yang boleh membuat kampanye.");
-             window.location.hash = "#dashboard";
-             return;
-        }
+      // 1. HALAMAN YANG BUTUH LOGIN
+      const protectedRoutes = ["dashboard", "create-form", "buat-relawan", "admin-relawan"];
+      if (protectedRoutes.includes(targetSectionId) && !user) {
+           alert("Silakan masuk terlebih dahulu.");
+           window.location.hash = "#login";
+           return;
+      }
 
-        // 3. Render Dashboard jika akses diizinkan
-        if (targetSectionId === "dashboard") {
-            renderDashboard();
-        }
-    }
+      // 2. HALAMAN KHUSUS ADMIN
+      const adminRoutes = ["create-form", "buat-relawan", "admin-relawan"];
+      if (adminRoutes.includes(targetSectionId) && user.role !== "admin") {
+          alert("Akses Ditolak! Halaman ini khusus Administrator.");
+          window.location.hash = "#dashboard";
+          return;
+      }
 
-    targetSection.classList.remove("hidden-section");
+      // Render khusus per halaman
+      if (targetSectionId === "dashboard") renderDashboard();
+      if (targetSectionId === "relawan") renderVolunteerPage();
+      if (targetSectionId === "admin-relawan") renderAdminRelawan();
 
-    if (targetSectionId === "detail" && campaignId) {
-      renderDetailPage(campaignId);
-      window.scrollTo(0, 0);
-    }
+      targetSection.classList.remove("hidden-section");
 
-    setTimeout(() => targetSection.classList.add("active-section"), 10);
+      if (targetSectionId === "detail" && campaignId) {
+        renderDetailPage(campaignId);
+        window.scrollTo(0, 0);
+      }
+
+      setTimeout(() => targetSection.classList.add("active-section"), 10);
   } else {
+    // Default fallback
     document.getElementById("home").classList.remove("hidden-section");
     document.getElementById("home").classList.add("active-section");
   }
@@ -623,9 +868,7 @@ function handleLogin(event) {
     document.getElementById("login-password").value = "";
     errorMsg.classList.add("hidden");
 
-    // Redirect ke dashboard untuk semua user yang login
     window.location.hash = "#dashboard";
-
     checkLoginStatus();
   } else {
     errorMsg.classList.remove("hidden");
@@ -643,8 +886,6 @@ function handleLogout() {
 function checkLoginStatus() {
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const navContainer = document.getElementById("nav-auth-container");
-
-  // Kita hapus logika "admin-actions-container" dari sini karena tombolnya sudah pindah ke Dashboard
   
   if (currentUser) {
     navContainer.innerHTML = `
@@ -674,6 +915,7 @@ window.addEventListener("load", () => {
   handleRouting();
   renderHomeCampaigns();
   renderExploreCampaigns();
+  renderVolunteerPage(); // init
   checkLoginStatus();
 });
 
