@@ -1,5 +1,5 @@
 // --- 1. DATA DUMMY (Database Sementara) ---
-const campaignsData = [
+let campaignsData = [
   {
     id: 1,
     title: "Jadilah pendukung pendidikan iklim untuk generasi masa depan",
@@ -9,7 +9,8 @@ const campaignsData = [
     target: 20000000,
     organizer: "UI Biology Festival",
     verified: true,
-    description: "Program ini bertujuan untuk memberikan edukasi mengenai perubahan iklim kepada siswa sekolah dasar di daerah terpencil. Donasi Anda akan digunakan untuk buku, alat peraga, dan operasional relawan.", // Tambahan deskripsi dummy
+    description:
+      "Program ini bertujuan untuk memberikan edukasi mengenai perubahan iklim kepada siswa sekolah dasar di daerah terpencil. Donasi Anda akan digunakan untuk buku, alat peraga, dan operasional relawan.",
   },
   {
     id: 2,
@@ -20,7 +21,8 @@ const campaignsData = [
     target: 108000000,
     organizer: "Sedekah Global",
     verified: true,
-    description: "Setiap hari Jumat, kami membagikan 500 porsi makan siang gratis untuk jamaah dan kaum dhuafa di sekitar masjid. Mari berbagi kebahagiaan melalui sebungkus nasi.",
+    description:
+      "Setiap hari Jumat, kami membagikan 500 porsi makan siang gratis untuk jamaah dan kaum dhuafa di sekitar masjid. Mari berbagi kebahagiaan melalui sebungkus nasi.",
   },
   {
     id: 3,
@@ -31,7 +33,8 @@ const campaignsData = [
     target: 30000000,
     organizer: "Keluarga Abah",
     verified: false,
-    description: "Abah Hendra sudah 3 tahun berjuang melawan stroke. Biaya pengobatan dan terapi sangat besar. Bantuan Anda sangat berarti untuk kesembuhan Abah.",
+    description:
+      "Abah Hendra sudah 3 tahun berjuang melawan stroke. Biaya pengobatan dan terapi sangat besar. Bantuan Anda sangat berarti untuk kesembuhan Abah.",
   },
   {
     id: 4,
@@ -42,7 +45,8 @@ const campaignsData = [
     target: 8000000,
     organizer: "Vege Team",
     verified: true,
-    description: "Membangun perpustakaan mini dan menyumbangkan alat tulis untuk anak-anak di pedalaman Sumatra yang kekurangan akses pendidikan.",
+    description:
+      "Membangun perpustakaan mini dan menyumbangkan alat tulis untuk anak-anak di pedalaman Sumatra yang kekurangan akses pendidikan.",
   },
   {
     id: 5,
@@ -53,7 +57,8 @@ const campaignsData = [
     target: 50000000,
     organizer: "Kawan Desa",
     verified: true,
-    description: "Jembatan satu-satunya penghubung desa ke kota putus akibat banjir bandang. Warga kesulitan menjual hasil bumi dan anak sekolah harus menyeberang sungai deras.",
+    description:
+      "Jembatan satu-satunya penghubung desa ke kota putus akibat banjir bandang. Warga kesulitan menjual hasil bumi dan anak sekolah harus menyeberang sungai deras.",
   },
   {
     id: 6,
@@ -64,29 +69,30 @@ const campaignsData = [
     target: 15000000,
     organizer: "Yayasan Harapan",
     verified: true,
-    description: "Memberikan beasiswa penuh untuk 10 anak yatim berprestasi agar bisa melanjutkan sekolah ke jenjang SMA.",
+    description:
+      "Memberikan beasiswa penuh untuk 10 anak yatim berprestasi agar bisa melanjutkan sekolah ke jenjang SMA.",
   },
 ];
 
-// --- [BARU] DATA USER (DATABASE AKUN) ---
+// --- DATA USER ---
 const usersData = [
   {
     id: 1,
     name: "Admin Super",
     email: "admin@ruangpeduli.com",
-    password: "admin123", // Password dummy
-    role: "admin", // KUNCI UTAMA: Role Admin
+    password: "admin123",
+    role: "admin",
   },
   {
     id: 2,
     name: "Budi Santoso",
     email: "user@gmail.com",
     password: "user123",
-    role: "user", // Role User biasa
+    role: "user",
   },
 ];
 
-// --- 2. HELPER: FORMAT RUPIAH ---
+// --- HELPER: FORMAT RUPIAH ---
 const formatRupiah = (number) => {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -97,38 +103,33 @@ const formatRupiah = (number) => {
     .replace("IDR", "Rp");
 };
 
-// --- 3. FUNGSI RENDER GENERIC (Pembuat Kartu HTML) ---
+// --- FUNGSI RENDER GENERIC (Pembuat Kartu HTML) ---
 function createCardHTML(item) {
   let percentage = (item.collected / item.target) * 100;
   if (percentage > 100) percentage = 100;
 
   const imgSrc = item.image;
 
-  // PERUBAHAN: Menambahkan onclick pada tombol Donasi spesifik agar lebih UX friendly
-  // Note: onclick pada div wrapper tetap ada sebagai fallback
+  // PERBAIKAN: Menambahkan referrerpolicy="no-referrer" agar Imgur tidak memblokir gambar
   return `
         <div onclick="window.location.href='#detail/${item.id}'" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full group cursor-pointer transform hover:-translate-y-1">
             
-            <!-- Gambar Card -->
             <div class="relative h-48 w-full overflow-hidden bg-gray-200">
-                <img src="${imgSrc}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
+                <img src="${imgSrc}" alt="${item.title}" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='https://placehold.co/400x200?text=Gagal+Memuat+Gambar'" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
                 <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-brand-700 shadow-sm border border-gray-100">
                     ${item.category}
                 </div>
             </div>
 
-            <!-- Konten Card -->
             <div class="p-5 flex flex-col flex-grow">
                 <h3 class="font-bold text-lg text-gray-900 leading-snug mb-3 line-clamp-2 min-h-[3.5rem] group-hover:text-brand-600 transition">
                     ${item.title}
                 </h3>
 
-                <!-- Progress Bar -->
                 <div class="w-full bg-gray-100 rounded-full h-2.5 mb-2 overflow-hidden">
                     <div class="bg-brand-500 h-2.5 rounded-full transition-all duration-1000" style="width: ${percentage}%"></div>
                 </div>
 
-                <!-- Info Donasi -->
                 <div class="flex justify-between items-center text-xs text-gray-500 mb-4">
                     <div>
                         <span class="text-brand-600 font-bold text-sm block">${formatRupiah(item.collected)}</span>
@@ -140,7 +141,6 @@ function createCardHTML(item) {
                     </div>
                 </div>
 
-                <!-- Organizer Info -->
                 <div class="mt-auto flex items-center pt-4 border-t border-gray-50">
                     <div class="w-8 h-8 rounded-full bg-brand-50 border border-brand-100 mr-3 flex items-center justify-center text-brand-500">
                         <i class="fas fa-user text-xs"></i>
@@ -152,7 +152,6 @@ function createCardHTML(item) {
                 </div>
             </div>
 
-            <!-- Tombol Donasi -->
             <div class="p-4 pt-0">
                 <button onclick="window.location.href='#detail/${item.id}'; event.stopPropagation();" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-lg transition duration-200 shadow-sm shadow-brand-200">
                     Donasi Sekarang
@@ -162,21 +161,21 @@ function createCardHTML(item) {
     `;
 }
 
-// --- 4. RENDER BERANDA (HOME) ---
+// --- RENDER BERANDA (HOME) ---
 function renderHomeCampaigns() {
   const container = document.getElementById("home-campaign-list");
   if (!container) return;
 
-  const trendingData = campaignsData.slice(0, 3); // Ambil 3 data pertama
+  const sortedData = [...campaignsData].reverse().slice(0, 3);
 
   let html = "";
-  trendingData.forEach((item) => {
+  sortedData.forEach((item) => {
     html += createCardHTML(item);
   });
   container.innerHTML = html;
 }
 
-// --- 5. RENDER HALAMAN GALANG DANA (EXPLORE) ---
+// --- RENDER HALAMAN GALANG DANA (EXPLORE) ---
 let currentCategory = "Semua";
 let currentSearch = "";
 
@@ -184,8 +183,8 @@ function renderExploreCampaigns() {
   const container = document.getElementById("all-campaign-list");
   if (!container) return;
 
-  // Filter Logic
-  const filtered = campaignsData.filter((item) => {
+  const reversedData = [...campaignsData].reverse();
+  const filtered = reversedData.filter((item) => {
     const matchCategory =
       currentCategory === "Semua" || item.category === currentCategory;
     const matchSearch = item.title
@@ -194,7 +193,6 @@ function renderExploreCampaigns() {
     return matchCategory && matchSearch;
   });
 
-  // Empty State
   if (filtered.length === 0) {
     container.innerHTML = `
             <div class="col-span-full text-center py-16 bg-white rounded-xl border border-dashed border-gray-300">
@@ -207,7 +205,6 @@ function renderExploreCampaigns() {
     return;
   }
 
-  // Generate HTML
   let html = "";
   filtered.forEach((item) => {
     html += createCardHTML(item);
@@ -215,41 +212,37 @@ function renderExploreCampaigns() {
   container.innerHTML = html;
 }
 
-// --- [BARU] FUNGSI RENDER DETAIL PAGE ---
+// --- RENDER DETAIL PAGE ---
 function renderDetailPage(id) {
-    const container = document.getElementById("detail-content");
-    if (!container) return; // Pastikan di HTML ada <div id="detail-content"></div>
+  const container = document.getElementById("detail-content");
+  if (!container) return;
 
-    // Cari data berdasarkan ID (konversi id ke number dulu karena url string)
-    const item = campaignsData.find(c => c.id == id);
+  const item = campaignsData.find((c) => c.id == id);
 
-    if (!item) {
-        container.innerHTML = `
+  if (!item) {
+    container.innerHTML = `
             <div class="text-center py-20">
                 <h2 class="text-2xl font-bold text-gray-700">Kampanye tidak ditemukan</h2>
                 <a href="#explore" class="text-brand-600 hover:underline">Kembali ke galang dana</a>
             </div>
         `;
-        return;
-    }
+    return;
+  }
 
-    let percentage = (item.collected / item.target) * 100;
-    if (percentage > 100) percentage = 100;
+  let percentage = (item.collected / item.target) * 100;
+  if (percentage > 100) percentage = 100;
 
-    // Masukkan HTML ke dalam detail-content
-    // Layout simpel: Gambar di kiri/atas, Info di kanan/bawah
-    container.innerHTML = `
+  // PERBAIKAN: Menambahkan referrerpolicy="no-referrer" di sini juga
+  container.innerHTML = `
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
             <div class="md:flex">
-                <!-- Sisi Gambar -->
                 <div class="md:w-1/2 h-64 md:h-auto relative bg-gray-200">
-                     <img src="${item.image}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" class="w-full h-full object-cover">
+                     <img src="${item.image}" alt="${item.title}" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=Gagal+Memuat+Gambar'" class="w-full h-full object-cover">
                      <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-sm font-bold text-brand-700">
                         ${item.category}
                      </div>
                 </div>
 
-                <!-- Sisi Konten -->
                 <div class="md:w-1/2 p-6 md:p-10 flex flex-col">
                     <div class="flex items-center gap-2 mb-4">
                          <div class="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-600">
@@ -262,10 +255,9 @@ function renderDetailPage(id) {
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">${item.title}</h1>
                     
                     <p class="text-gray-600 mb-6 leading-relaxed">
-                        ${item.description || "Belum ada deskripsi lengkap untuk kampanye ini. Namun bantuan Anda tetap sangat berarti bagi mereka."}
+                        ${item.description || "Belum ada deskripsi lengkap untuk kampanye ini."}
                     </p>
 
-                    <!-- Progress Info -->
                     <div class="mt-auto bg-gray-50 p-6 rounded-xl border border-gray-100">
                         <div class="flex justify-between items-end mb-2">
                             <div>
@@ -293,12 +285,10 @@ function renderDetailPage(id) {
     `;
 }
 
-
-// --- 6. HANDLE FILTER & BUTTONS ---
+// --- HANDLE FILTER & BUTTONS ---
 function filterCampaigns(category) {
   currentCategory = category;
 
-  // Update Tampilan Tombol
   document.querySelectorAll(".filter-btn").forEach((btn) => {
     if (btn.dataset.category === category) {
       btn.className =
@@ -319,7 +309,6 @@ function resetFilter() {
   filterCampaigns("Semua");
 }
 
-// Listener Search di halaman Explore
 const exploreSearchInput = document.getElementById("explore-search");
 if (exploreSearchInput) {
   exploreSearchInput.addEventListener("input", (e) => {
@@ -328,50 +317,136 @@ if (exploreSearchInput) {
   });
 }
 
-// --- 7. SPA ROUTING (Diperbarui untuk Detail) ---
+// --- [BARU] FUNGSI PREVIEW GAMBAR ---
+function updateImagePreview() {
+  const url = document.getElementById("new-image").value.trim();
+  const preview = document.getElementById("image-preview");
+
+  if (!preview) return; // Mencegah error jika elemen preview tidak ada
+
+  // PERBAIKAN: Set referrerPolicy untuk elemen preview juga
+  preview.referrerPolicy = "no-referrer";
+
+  if (url && url.length > 0) {
+    preview.src = url;
+    preview.classList.remove("opacity-50");
+  } else {
+    preview.src = "https://placehold.co/600x400?text=Pratinjau+Gambar";
+    preview.classList.add("opacity-50");
+  }
+}
+
+// --- LOGIKA FORM GALANG DANA ---
+function handleCreateCampaign(event) {
+  event.preventDefault(); // Cegah reload
+
+  // Ambil data dari form dan gunakan TRIM untuk menghapus spasi berlebih
+  const title = document.getElementById("new-title").value.trim();
+  const category = document.getElementById("new-category").value;
+  const target = parseInt(document.getElementById("new-target").value);
+  const organizer = document.getElementById("new-organizer").value.trim();
+  const imageInput = document.getElementById("new-image").value.trim();
+  const description = document.getElementById("new-description").value.trim();
+
+  // Gunakan placeholder jika gambar kosong atau invalid string
+  const image =
+    imageInput && imageInput.length > 0
+      ? imageInput
+      : "https://placehold.co/600x400?text=Gambar+Kampanye";
+
+  // Buat ID baru (Max ID + 1)
+  const newId =
+    campaignsData.length > 0
+      ? Math.max(...campaignsData.map((c) => c.id)) + 1
+      : 1;
+
+  // Object Kampanye Baru
+  const newCampaign = {
+    id: newId,
+    title: title,
+    image: image,
+    category: category,
+    collected: 0, // Awal 0
+    target: target,
+    organizer: organizer,
+    verified: true, // Auto verified karena admin yang buat
+    description: description,
+  };
+
+  // Masukkan ke Database Array
+  campaignsData.push(newCampaign);
+
+  // Reset Form
+  event.target.reset();
+
+  // Reset Preview
+  updateImagePreview();
+
+  // Redirect kembali ke halaman Explore
+  window.location.hash = "#create";
+
+  // Re-render semua halaman agar data muncul
+  renderExploreCampaigns();
+  renderHomeCampaigns();
+
+  // Optional: Alert sukses
+  alert("Kampanye berhasil dibuat!");
+}
+
+// --- SPA ROUTING ---
 function handleRouting() {
   const hash = window.location.hash || "#home";
 
-  // Bersihkan tampilan section
   document.querySelectorAll("section").forEach((section) => {
     section.classList.remove("active-section");
     section.classList.add("hidden-section");
   });
 
-  // LOGIKA BARU: Pisahkan ID dari Hash
-  // Contoh: #detail/1 -> targetSectionId = "detail", campaignId = "1"
   let targetSectionId = hash.replace("#", "");
   let campaignId = null;
 
   if (targetSectionId.includes("/")) {
-      const parts = targetSectionId.split("/");
-      targetSectionId = parts[0]; // "detail"
-      campaignId = parts[1];      // "1" (ID nya)
+    const parts = targetSectionId.split("/");
+    targetSectionId = parts[0];
+    campaignId = parts[1];
   }
 
-  // Ambil elemen section berdasarkan ID
   const targetSection = document.getElementById(targetSectionId);
 
   if (targetSection) {
-    targetSection.classList.remove("hidden-section");
-    
-    // Jika kita sedang di halaman detail, render datanya!
-    if (targetSectionId === "detail" && campaignId) {
-        renderDetailPage(campaignId);
-        window.scrollTo(0, 0);
+    // PROTEKSI HALAMAN ADMIN
+    if (targetSectionId === "create-form") {
+      const user = JSON.parse(localStorage.getItem("currentUser"));
+      if (!user || user.role !== "admin") {
+        alert("Akses ditolak! Hanya admin yang boleh masuk.");
+        window.location.hash = "#home";
+        return;
+      }
+
+      // [UPDATE] Bind Event Listener untuk Preview Gambar saat section Form aktif
+      setTimeout(() => {
+        const imageInput = document.getElementById("new-image");
+        if (imageInput) {
+          imageInput.addEventListener("input", updateImagePreview);
+        }
+      }, 100);
     }
-    
+
+    targetSection.classList.remove("hidden-section");
+
+    if (targetSectionId === "detail" && campaignId) {
+      renderDetailPage(campaignId);
+      window.scrollTo(0, 0);
+    }
+
     setTimeout(() => targetSection.classList.add("active-section"), 10);
   } else {
-    // Default ke Home jika hash tidak dikenali
     document.getElementById("home").classList.remove("hidden-section");
     document.getElementById("home").classList.add("active-section");
   }
 
-  // Update Navbar Active State (Hanya jika link navbar cocok persis)
   document.querySelectorAll("nav a").forEach((link) => {
     const href = link.getAttribute("href");
-    // Navbar aktif jika hash sama persis, ATAU jika kita di detail tapi navbar Home yang nyala (opsional)
     if (href === hash) {
       link.classList.add("text-brand-600");
     } else {
@@ -382,42 +457,37 @@ function handleRouting() {
   if (!campaignId) window.scrollTo(0, 0);
 }
 
-// --- 8. SISTEM LOGIN & OTENTIKASI ---
-
-// Fungsi Login
+// --- SISTEM LOGIN & OTENTIKASI ---
 function handleLogin(event) {
-  event.preventDefault(); // Mencegah reload halaman
+  event.preventDefault();
 
   const emailInput = document.getElementById("login-email").value;
   const passInput = document.getElementById("login-password").value;
   const errorMsg = document.getElementById("login-error");
 
-  // Cari user yang cocok
   const foundUser = usersData.find(
     (u) => u.email === emailInput && u.password === passInput,
   );
 
   if (foundUser) {
-    // Simpan data user ke Local Storage
     localStorage.setItem("currentUser", JSON.stringify(foundUser));
-
-    // Reset form
     document.getElementById("login-email").value = "";
     document.getElementById("login-password").value = "";
     errorMsg.classList.add("hidden");
 
-    // Redirect ke halaman Donasi (agar langsung lihat fitur admin)
-    window.location.hash = "#create";
+    // Redirect
+    if (foundUser.role === "admin") {
+      window.location.hash = "#create"; // Admin ke halaman donasi
+    } else {
+      window.location.hash = "#home";
+    }
 
-    // Update UI segera
     checkLoginStatus();
   } else {
-    // Tampilkan Error
     errorMsg.classList.remove("hidden");
   }
 }
 
-// Fungsi Logout
 function handleLogout() {
   if (confirm("Yakin ingin keluar?")) {
     localStorage.removeItem("currentUser");
@@ -426,13 +496,13 @@ function handleLogout() {
   }
 }
 
-// Fungsi Cek Status Login & Update UI
 function checkLoginStatus() {
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const navContainer = document.getElementById("nav-auth-container");
-  const adminContainer = document.getElementById("admin-actions-container");
+  const adminContainer = document.getElementById(
+    "admin-actions-container",
+  );
 
-  // 1. Update Navbar (Masuk vs Keluar)
   if (currentUser) {
     navContainer.innerHTML = `
             <div class="flex items-center gap-3">
@@ -450,8 +520,7 @@ function checkLoginStatus() {
         `;
   }
 
-  // 2. Fitur Khusus Admin (Tombol Buat Kampanye)
-  // Cek: Apakah user login? DAN apakah role-nya admin?
+  // [MODIFIKASI] Fitur Khusus Admin - Mengarahkan ke Form
   if (currentUser && currentUser.role === "admin") {
     if (adminContainer) {
       adminContainer.innerHTML = `
@@ -462,24 +531,22 @@ function checkLoginStatus() {
                         </h3>
                         <p class="text-brand-50 text-sm opacity-90">Anda memiliki akses untuk membuat penggalangan dana baru.</p>
                     </div>
-                    <button onclick="alert('Fitur Form Buat Kampanye akan muncul di sini!')" class="bg-white text-brand-600 font-bold py-3 px-6 rounded-lg shadow hover:bg-gray-50 transition flex items-center gap-2">
+                    <button onclick="window.location.href='#create-form'" class="bg-white text-brand-600 font-bold py-3 px-6 rounded-lg shadow hover:bg-gray-50 transition flex items-center gap-2">
                         <i class="fas fa-plus-circle"></i> Buat Kampanye Baru
                     </button>
                 </div>
             `;
     }
   } else {
-    // Jika bukan admin atau belum login, kosongkan container
     if (adminContainer) adminContainer.innerHTML = "";
   }
 }
 
-// --- 9. INITIALIZATION ---
 window.addEventListener("load", () => {
   handleRouting();
   renderHomeCampaigns();
   renderExploreCampaigns();
-  checkLoginStatus(); // Cek login saat pertama kali load
+  checkLoginStatus();
 });
 
 window.addEventListener("hashchange", handleRouting);
