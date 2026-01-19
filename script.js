@@ -237,40 +237,55 @@ if(exploreSearchInput) {
 
 // --- 7. SPA ROUTING (Standard) ---
 function handleRouting() {
-    const hash = window.location.hash || '#home';
-    
-    // Bersihkan tampilan section
-    document.querySelectorAll('section').forEach(section => {
-        section.classList.remove('active-section');
-        section.classList.add('hidden-section');
-    });
-    
-    // Tentukan target
-    let targetId = hash.replace('#', '');
-    if(targetId.includes('/')) targetId = targetId.split('/')[0];
-    
-    const targetSection = document.getElementById(targetId);
+  const hash = window.location.hash || "#home";
 
-    if (targetSection) {
-        targetSection.classList.remove('hidden-section');
-        setTimeout(() => targetSection.classList.add('active-section'), 10);
-    } else {
-        // Default ke Home jika hash tidak dikenali
-        document.getElementById('home').classList.remove('hidden-section');
-        document.getElementById('home').classList.add('active-section');
+  // 1. Sembunyikan semua section (Jangan hapus logika ini)
+  document.querySelectorAll("section").forEach((section) => {
+    section.classList.remove("active-section");
+    section.classList.add("hidden-section");
+  });
+
+  let targetSectionId = hash.replace("#", "");
+  let campaignId = null;
+
+  if (targetSectionId.includes("/")) {
+      const parts = targetSectionId.split("/");
+      targetSectionId = parts[0]; 
+      campaignId = parts[1];      
+  }
+
+  const targetSection = document.getElementById(targetSectionId);
+
+  if (targetSection) {
+    targetSection.classList.remove("hidden-section");
+    
+    // 2. Render Detail jika ID kampanye ada (Tetap dipertahankan)
+    if (targetSectionId === "detail" && campaignId) {
+        renderDetailPage(campaignId);
     }
+    
+    // 3. TAMBAHAN: Jeda 10ms untuk memicu animasi slide-up & fade-in dari CSS
+    setTimeout(() => {
+        targetSection.classList.add("active-section");
+    }, 10);
+  } else {
+    // Default ke Home
+    const homeSection = document.getElementById("home");
+    homeSection.classList.remove("hidden-section");
+    homeSection.classList.add("active-section");
+  }
 
-    // Update Navbar Active State
-    document.querySelectorAll('nav a').forEach(link => {
-        const href = link.getAttribute('href');
-        if(href === hash) {
-            link.classList.add('text-brand-600');
-        } else {
-            link.classList.remove('text-brand-600');
-        }
-    });
+  // 4. Update Navbar Active State
+  document.querySelectorAll("nav a").forEach((link) => {
+    const href = link.getAttribute("href");
+    if (href === hash) {
+      link.classList.add("text-brand-600");
+    } else {
+      link.classList.remove("text-brand-600");
+    }
+  });
 
-    window.scrollTo(0, 0);
+  if (!campaignId) window.scrollTo(0, 0);
 }
 
 // --- [BARU] 8. SISTEM LOGIN & OTENTIKASI ---
