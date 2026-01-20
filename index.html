@@ -169,15 +169,8 @@
         </div>
 
         <!-- Header Kampanye Trending -->
-        <div class="flex justify-between items-end mb-8">
-          <div>
-            <h2 class="text-2xl font-bold text-gray-900">
-              Sedang Hangat <i class="fas fa-fire text-red-500 ml-1"></i>
-            </h2>
-            <p class="text-gray-500 mt-1">
-              Kampanye yang paling banyak dilihat hari ini.
-            </p>
-          </div>
+        <!-- UPDATED: Menggunakan justify-end agar tombol ke kanan setelah teks judul dihapus -->
+        <div class="flex justify-end items-end mb-8">
           <a
             href="#create"
             class="hidden md:block text-brand-600 font-bold hover:underline"
@@ -283,7 +276,7 @@
       <!-- SECTION RELAWAN (PUBLIC LIST) -->
       <section id="relawan" class="hidden-section pt-4 pb-16">
         <div class="max-w-7xl mx-auto">
-             <div class="text-center mb-10 py-8 bg-blue-50 rounded-2xl border border-blue-100">
+              <div class="text-center mb-10 py-8 bg-blue-50 rounded-2xl border border-blue-100">
                 <h2 class="text-3xl font-bold text-gray-900 mb-2">
                   Aksi Relawan
                 </h2>
@@ -315,22 +308,22 @@
               </div>
 
               <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                   <div class="overflow-x-auto">
-                       <table class="w-full text-left border-collapse">
-                           <thead class="bg-gray-100 text-gray-600 text-sm uppercase">
-                               <tr>
-                                   <th class="px-6 py-4">Nama Relawan</th>
-                                   <th class="px-6 py-4">Kegiatan</th>
-                                   <th class="px-6 py-4">Kontak</th>
-                                   <th class="px-6 py-4">Status</th>
-                                   <th class="px-6 py-4 text-center">Aksi</th>
-                               </tr>
-                           </thead>
-                           <tbody id="admin-volunteer-tbody" class="divide-y divide-gray-100 text-sm">
-                               <!-- JS Injected -->
-                           </tbody>
-                       </table>
-                   </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-100 text-gray-600 text-sm uppercase">
+                                <tr>
+                                    <th class="px-6 py-4">Nama Relawan</th>
+                                    <th class="px-6 py-4">Kegiatan</th>
+                                    <th class="px-6 py-4">Kontak / Alamat</th>
+                                    <th class="px-6 py-4">Status</th>
+                                    <th class="px-6 py-4 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-volunteer-tbody" class="divide-y divide-gray-100 text-sm">
+                                <!-- JS Injected -->
+                            </tbody>
+                        </table>
+                    </div>
               </div>
           </div>
       </section>
@@ -452,7 +445,8 @@
           </div>
 
           <!-- Stats Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <!-- UPDATED: Mengubah md:grid-cols-3 menjadi md:grid-cols-2 agar 2 kartu sisanya seimbang/ditengah -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
             <!-- Card 1 -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
                 <div class="w-14 h-14 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 mr-4">
@@ -475,16 +469,7 @@
                 </div>
             </div>
 
-            <!-- Card 3 -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
-                <div class="w-14 h-14 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600 mr-4">
-                    <i class="fas fa-star text-2xl"></i>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-500 font-medium">Poin Kebaikan</p>
-                    <h3 class="text-2xl font-bold text-gray-900">1,250 XP</h3>
-                </div>
-            </div>
+            <!-- Card 3 (Poin Kebaikan) dihapus sesuai permintaan -->
           </div>
 
           <!-- Admin Management Table (Hanya Muncul untuk Admin) -->
@@ -948,7 +933,7 @@
       </div>
     </footer>
 
-    <!-- NEW DONATION MODAL -->
+    <!-- DONATION MODAL -->
     <div id="donation-modal" class="fixed inset-0 z-[60] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <!-- Background Overlay -->
@@ -1030,6 +1015,67 @@
                     <button type="button" onclick="closeDonationModal()" class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                         Batal
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: VOLUNTEER REGISTRATION MODAL -->
+    <div id="volunteer-modal" class="fixed inset-0 z-[60] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Overlay -->
+            <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" aria-hidden="true" onclick="closeVolunteerModal()"></div>
+            
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <!-- Modal Panel -->
+            <div class="inline-block w-full max-w-lg overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl sm:my-8">
+                <div class="bg-white p-6">
+                    <div class="w-full">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold leading-6 text-gray-900">
+                                Daftar Jadi Relawan
+                            </h3>
+                            <button onclick="closeVolunteerModal()" class="text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="p-4 mb-4 bg-blue-50 rounded-lg border border-blue-100">
+                            <h4 id="vol-modal-title" class="font-bold text-blue-800 text-sm mb-1">Judul Kegiatan</h4>
+                            <p class="text-xs text-blue-600"><i class="fas fa-map-marker-alt mr-1"></i> <span id="vol-modal-location">Lokasi</span></p>
+                        </div>
+
+                        <form id="volunteer-form" onsubmit="handleVolunteerSubmit(event)">
+                            <!-- Nama Lengkap -->
+                            <div class="mb-4">
+                                <label class="block mb-2 text-sm font-bold text-gray-700">Nama Lengkap</label>
+                                <input type="text" id="vol-name" required class="w-full py-2.5 px-3 text-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="Nama sesuai KTP">
+                            </div>
+
+                            <!-- Email -->
+                            <div class="mb-4">
+                                <label class="block mb-2 text-sm font-bold text-gray-700">Alamat Email</label>
+                                <input type="email" id="vol-email" required class="w-full py-2.5 px-3 text-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="email@contoh.com">
+                            </div>
+
+                            <!-- Nomor Telepon (WA) -->
+                            <div class="mb-4">
+                                <label class="block mb-2 text-sm font-bold text-gray-700">Nomor Telepon / WhatsApp</label>
+                                <input type="tel" id="vol-phone" required class="w-full py-2.5 px-3 text-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="Contoh: 08123456789">
+                            </div>
+
+                            <!-- Alamat Rumah -->
+                            <div class="mb-4">
+                                <label class="block mb-2 text-sm font-bold text-gray-700">Alamat Rumah</label>
+                                <textarea id="vol-address" rows="3" required class="w-full py-2.5 px-3 text-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="Alamat lengkap domisili saat ini..."></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-lg hover:bg-blue-700 transition transform hover:-translate-y-1">
+                                Kirim Pendaftaran
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
