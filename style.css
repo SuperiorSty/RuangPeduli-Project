@@ -54,78 +54,33 @@ section.active-section {
     .footer-grid {
         grid-template-columns: repeat(3, 1fr);
     }
-}
-
-.footer-logo {
-    height: 4rem;
-    width: auto;
-    margin-bottom: 1rem;
-}
-
-.footer-description {
-    font-size: 0.875rem;
-    line-height: 1.6;
-    max-width: 20rem;
-}
-
-.footer-title {
-    color: #ffffff;
-    font-size: 0.875rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 1.5rem;
-}
-
-.footer-list {
-    list-style: none;
-    padding: 0;
+  }
+  
+/* Menghilangkan margin bawaan paragraf untuk memadatkan teks */
+footer p {
     margin: 0;
-    font-size: 0.875rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
 }
 
-.footer-link {
-    color: #d1d5db;
-    text-decoration: none;
-    transition: color 0.3s ease;
+/* Mengunci warna dan bentuk footer */
+footer {
+    background-color: #0f172a !important;
 }
 
-.footer-link:hover {
-    color: #ffffff;
+/* Border radius sesuai desain */
+footer.rounded-t-\[50px\] {
+    border-top-left-radius: 50px;
+    border-top-right-radius: 50px;
 }
 
-.footer-divider {
-    border: 0;
-    border-top: 1px solid #374151; /* Warna garis pemisah */
-    margin-bottom: 2rem;
-    opacity: 0.5;
+/* Memastikan teks deskripsi tidak terlalu renggang */
+.leading-snug {
+    line-height: 1.4;
 }
 
-.footer-bottom {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 0.875rem;
-    gap: 1rem;
-}
-
-@media (min-width: 768px) {
-    .footer-bottom {
-        flex-direction: row;
+@media (max-width: 768px) {
+    footer {
+        border-top-left-radius: 30px;
+        border-top-right-radius: 30px;
+        padding-top: 2rem;
     }
-}
-
-.terms-link {
-    color: #d1d5db;
-    text-decoration: none;
-    text-transform: lowercase;
-    transition: color 0.3s ease;
-}
-
-.terms-link:hover {
-    color: #ffffff;
 }
