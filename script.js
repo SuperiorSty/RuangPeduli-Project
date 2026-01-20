@@ -98,9 +98,10 @@ let volunteerCampaigns = [
 ];
 
 // Data Pendaftar Relawan (Applicants)
+// Structure Updated: Added email, address
 let volunteerApplicants = [
-    { id: 1, campaignId: 201, userId: 2, name: "Budi Santoso", contact: "08123456789", status: "Pending" },
-    { id: 2, campaignId: 202, userId: 2, name: "Budi Santoso", contact: "08123456789", status: "Diterima" }
+    { id: 1, campaignId: 201, userId: 2, name: "Budi Santoso", email: "user@gmail.com", contact: "08123456789", address: "Jl. Merdeka No 1", status: "Pending" },
+    { id: 2, campaignId: 202, userId: 2, name: "Budi Santoso", email: "user@gmail.com", contact: "08123456789", address: "Jl. Merdeka No 1", status: "Diterima" }
 ];
 
 
@@ -340,9 +341,15 @@ function renderAdminRelawan() {
 
         html += `
             <tr class="hover:bg-gray-50">
-                <td class="px-6 py-4 font-bold text-gray-700">${app.name}</td>
+                <td class="px-6 py-4">
+                    <div class="font-bold text-gray-700">${app.name}</div>
+                    <div class="text-xs text-gray-400">${app.email || '-'}</div>
+                </td>
                 <td class="px-6 py-4 text-gray-600">${title}</td>
-                <td class="px-6 py-4 text-gray-500">${app.contact}</td>
+                <td class="px-6 py-4 text-gray-500">
+                    <div class="font-medium text-gray-600"><i class="fab fa-whatsapp text-green-500 mr-1"></i>${app.contact}</div>
+                    <div class="text-xs text-gray-400 truncate max-w-[150px]" title="${app.address || ''}">${app.address || '-'}</div>
+                </td>
                 <td class="px-6 py-4">${statusBadge}</td>
                 <td class="px-6 py-4 text-center">
                     ${app.status === 'Pending' ? `
@@ -594,15 +601,15 @@ function renderDetailPage(id) {
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
             <div class="md:flex">
                 <div class="md:w-1/2 h-64 md:h-auto relative bg-gray-200">
-                     <img src="${item.image}" alt="${item.title}" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=Gagal+Memuat+Gambar'" class="w-full h-full object-cover">
-                     
-                     <div class="absolute top-4 right-4 ${badgeClass} text-white px-3 py-1 rounded-lg text-sm font-bold shadow-md z-10">
+                      <img src="${item.image}" alt="${item.title}" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=Gagal+Memuat+Gambar'" class="w-full h-full object-cover">
+                      
+                      <div class="absolute top-4 right-4 ${badgeClass} text-white px-3 py-1 rounded-lg text-sm font-bold shadow-md z-10">
                         ${badgeText}
-                     </div>
+                      </div>
 
-                     <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-sm font-bold text-brand-700">
+                      <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-sm font-bold text-brand-700">
                         ${item.category}
-                     </div>
+                      </div>
                 </div>
 
                 <div class="md:w-1/2 p-6 md:p-10 flex flex-col">
@@ -799,7 +806,7 @@ function handleCreateCampaign(event) {
   alert("Kampanye Donasi berhasil dibuat!");
 }
 
-// --- LOGIKA FORM RELAWAN ---
+// --- LOGIKA FORM RELAWAN (ADMIN CREATE) ---
 function handleCreateVolunteerCampaign(event) {
     event.preventDefault();
 
@@ -833,33 +840,77 @@ function handleCreateVolunteerCampaign(event) {
     alert("Kegiatan Relawan berhasil dibuat!");
 }
 
-// --- LOGIKA DAFTAR RELAWAN (USER) ---
+// --- [UPDATE] LOGIKA DAFTAR RELAWAN (MODAL GUEST) ---
+let currentVolCampaignId = null;
+
 function registerVolunteer(campaignId) {
+    // Cari data campaign
+    const campaign = volunteerCampaigns.find(c => c.id === campaignId);
+    if(!campaign) return;
+
+    currentVolCampaignId = campaignId;
+    
+    // Set Modal Content
+    document.getElementById('vol-modal-title').innerText = campaign.title;
+    document.getElementById('vol-modal-location').innerText = campaign.location;
+    
+    // Clear Form
+    document.getElementById('volunteer-form').reset();
+
+    // Pre-fill jika user login
     const user = JSON.parse(localStorage.getItem("currentUser"));
-    if (!user) {
-        alert("Silakan login terlebih dahulu untuk mendaftar jadi relawan!");
-        window.location.hash = "#login";
+    if(user) {
+        document.getElementById('vol-name').value = user.name;
+        document.getElementById('vol-email').value = user.email;
+        // Phone & Address tidak ada di data user basic, jadi biarkan kosong
+    }
+
+    // Open Modal
+    document.getElementById('volunteer-modal').classList.remove('hidden');
+}
+
+function closeVolunteerModal() {
+    document.getElementById('volunteer-modal').classList.add('hidden');
+    currentVolCampaignId = null;
+}
+
+function handleVolunteerSubmit(event) {
+    event.preventDefault();
+
+    // Ambil data form
+    const name = document.getElementById('vol-name').value.trim();
+    const email = document.getElementById('vol-email').value.trim();
+    const phone = document.getElementById('vol-phone').value.trim();
+    const address = document.getElementById('vol-address').value.trim();
+
+    // Cek duplikasi (berdasarkan email & campaign ID untuk guest)
+    const existing = volunteerApplicants.find(a => a.campaignId === currentVolCampaignId && a.email === email);
+    if(existing) {
+        alert("Email ini sudah terdaftar untuk kegiatan ini.");
         return;
     }
 
-    // Cek apakah sudah mendaftar
-    const alreadyRegistered = volunteerApplicants.find(a => a.campaignId === campaignId && a.userId === user.id);
-    if(alreadyRegistered) {
-        alert("Anda sudah mendaftar di kegiatan ini. Silakan tunggu konfirmasi.");
-        return;
-    }
-
-    const newApp = {
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+    
+    // Buat data pendaftar baru
+    const newApplicant = {
         id: Date.now(),
-        campaignId: campaignId,
-        userId: user.id,
-        name: user.name,
-        contact: "081xxxxxxx", // Default kontak
+        campaignId: currentVolCampaignId,
+        userId: user ? user.id : 9999, // 9999 for Guest
+        name: name,
+        email: email,
+        contact: phone, // Mapping phone ke contact
+        address: address,
         status: "Pending"
     };
 
-    volunteerApplicants.push(newApp);
-    alert("Berhasil mendaftar! Admin akan meninjau pendaftaran Anda.");
+    volunteerApplicants.push(newApplicant);
+    
+    closeVolunteerModal();
+    alert(`Terima kasih, ${name}! Pendaftaran Anda telah diterima dan menunggu konfirmasi admin.`);
+    
+    // Refresh admin table jika sedang dibuka di tab lain/admin
+    renderAdminRelawan();
 }
 
 // --- LOGIKA TERIMA/TOLAK RELAWAN (ADMIN) ---
@@ -1004,6 +1055,38 @@ function checkLoginStatus() {
             </a>
         `;
   }
+}
+
+// --- GLOBAL SEARCH LOGIC (FIXED) ---
+// Menambahkan event listener untuk global search di navbar
+const globalSearchInput = document.getElementById("global-search");
+if (globalSearchInput) {
+    globalSearchInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            const query = globalSearchInput.value;
+            if(!query) return;
+
+            // 1. Pindah ke halaman explore (#create)
+            window.location.hash = "#create";
+
+            // 2. Set nilai input search di halaman explore
+            // Gunakan timeout kecil agar halaman sempat dirender
+            setTimeout(() => {
+                const exploreInput = document.getElementById("explore-search");
+                if(exploreInput) {
+                    exploreInput.value = query;
+                    
+                    // 3. Trigger input event agar filter berjalan
+                    // Kita update global var currentSearch dulu
+                    currentSearch = query;
+                    renderExploreCampaigns();
+                    
+                    // Scroll ke bagian list
+                    document.getElementById("all-campaign-list").scrollIntoView({behavior: "smooth"});
+                }
+            }, 100);
+        }
+    });
 }
 
 window.addEventListener("load", () => {
